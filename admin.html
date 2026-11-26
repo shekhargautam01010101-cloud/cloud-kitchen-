@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <title>Owner dashboard · ANDAAZ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/admin.js"></script>
+</head>
+<body data-page="admin">
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">A</span><span><b>ANDAAZ</b><small>THE OMELETTE KITCHEN</small></span></a><nav aria-label="Main navigation"><a href="index.html#menu">Customer site</a><a href="account.html">Customer account</a></nav><a class="button button-dark" href="index.html">View website</a></header>
+  <main class="subpage"><div class="page-heading"><p class="eyebrow">PRIVATE STAFF AREA</p><h1>Owner <em>dashboard.</em></h1><p>Only accounts explicitly authorized in Firestore can access customer orders.</p></div>
+    <p id="admin-message" class="form-message" role="status" aria-live="polite"></p>
+    <form id="staff-login" class="panel"><h2>Staff sign in</h2><div class="form-row"><div class="field"><label for="staff-email">Email</label><input id="staff-email" type="email" autocomplete="username" required></div><div class="field"><label for="staff-password">Password</label><input id="staff-password" type="password" autocomplete="current-password" required></div></div><button class="button button-dark" type="submit">Sign in</button></form>
+    <section id="dashboard" hidden>
+      <div class="admin-metrics"><div class="metric"><span>Today's orders</span><strong id="today-orders">0</strong></div><div class="metric"><span>Today's order revenue*</span><strong id="today-revenue">₹0</strong></div><div class="metric"><span>Today's out-of-area</span><strong id="today-out-area">0</strong></div></div>
+      <p class="muted">*Estimated order value for accepted and active orders; the site does not process payments.</p>
+      <div class="admin-toolbar"><div class="field"><label for="order-filter">Filter orders</label><select id="order-filter"><option value="all">All</option><option value="new">New</option><option value="out-of-area">Out-of-Area</option><option value="accepted">Accepted / active</option><option value="delivered">Delivered</option><option value="declined">Declined</option></select></div><div><button id="enable-sound" class="button-outline" type="button">Enable new-order sound</button></div><button id="staff-sign-out" class="button button-dark" type="button">Sign out</button></div>
+      <div id="orders-list" aria-live="polite"></div>
+    </section>
+  </main>
+  <footer class="site-footer"><a class="brand" href="index.html"><span class="brand-mark">A</span><span><b>ANDAAZ</b><small>THE OMELETTE KITCHEN</small></span></a><p>ANDAAZ – Not Just An Omelette. It's A Whole New Andaz Of Eating.</p><a href="tel:+917011282410">7011282410</a></footer>
+</body>
+</html>

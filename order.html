@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <title>Checkout · ANDAAZ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body data-page="checkout">
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">A</span><span><b>ANDAAZ</b><small>THE OMELETTE KITCHEN</small></span></a><nav aria-label="Main navigation"><a href="index.html#menu">Menu</a><a href="account.html">My orders</a></nav><a class="button button-dark" href="index.html">Back to menu</a></header>
+  <main class="subpage">
+    <div class="page-heading"><p class="eyebrow">CHECKOUT · GUEST ORDERING AVAILABLE</p><h1>Let's make it <em>yours.</em></h1><p>Choose your delivery pin. Outside the Jhanjheri radius? We'll still receive your request and confirm or decline it.</p><p class="notice">Operating hours: 5:00 PM – 10:30 PM (IST). Orders after 10:30 PM include a ₹20 midnight charge. Ordering remains open for requests outside these hours.</p></div>
+    <div class="content-grid">
+      <section class="panel"><h2>Delivery details</h2><form id="checkout-form">
+        <div class="form-row"><div class="field"><label for="customer-name">Your name</label><input id="customer-name" name="name" autocomplete="name" maxlength="80" required></div><div class="field"><label for="customer-phone">Phone number</label><input id="customer-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" pattern="[0-9+() -]{7,20}" required></div></div>
+        <div class="field"><label for="delivery-address">Delivery address</label><input id="delivery-address" name="address" autocomplete="street-address" maxlength="300" required placeholder="Search a place or enter your address"></div>
+        <div class="map-tools"><button class="button-outline" id="use-location" type="button" disabled>Use my current location</button><a class="button-outline" href="account.html">Sign in to use saved details</a></div>
+        <div id="map" class="map-canvas" aria-label="Choose your delivery location on the map"></div>
+        <p class="form-message" id="maps-message" role="status"></p><p id="area-status" class="map-status">Choose a delivery location to check the service radius.</p>
+        <div class="field"><label for="order-notes">Notes for the kitchen (optional)</label><textarea id="order-notes" name="notes" rows="3" maxlength="300"></textarea></div>
+        <label class="inline-check"><input id="save-address" type="checkbox" checked> Save my name, phone, and address to my customer profile</label>
+        <p id="checkout-message" class="form-message" role="status" aria-live="polite"></p>
+        <button id="place-order" class="button button-dark" type="submit">Send order request <span aria-hidden="true">→</span></button>
+      </form></section>
+      <aside class="panel"><h2>Your bill</h2><div class="bill-items" id="checkout-items"></div><div class="bill-line"><span>Subtotal</span><strong id="subtotal">₹0</strong></div><div class="bill-line" id="midnight-line" hidden><span>Midnight charge</span><strong id="midnight-charge">₹0</strong></div><p id="midnight-notice" class="notice" hidden>A ₹20 charge applies to orders placed after 10:30 PM IST.</p><div class="bill-line bill-total"><span>Total</span><strong id="order-total">₹0</strong></div><p class="muted">No payment is taken online. The kitchen will confirm your request.</p><a href="account.html" class="text-link">Already have an account? Save your details →</a></aside>
+    </div>
+  </main>
+  <footer class="site-footer"><a class="brand" href="index.html"><span class="brand-mark">A</span><span><b>ANDAAZ</b><small>THE OMELETTE KITCHEN</small></span></a><p>ANDAAZ – Not Just An Omelette. It's A Whole New Andaz Of Eating.</p><a href="tel:+917011282410">7011282410</a></footer>
+</body>
+</html>

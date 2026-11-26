@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <title>My account · ANDAAZ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/auth.js"></script>
+</head>
+<body data-page="account">
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">A</span><span><b>ANDAAZ</b><small>THE OMELETTE KITCHEN</small></span></a><nav aria-label="Main navigation"><a href="index.html#menu">Menu</a><a href="order.html">Checkout</a></nav><a class="button button-dark" href="order.html">Order now</a></header>
+  <main class="subpage"><div class="page-heading"><p class="eyebrow">YOUR ANDAAZ</p><h1>Account & <em>orders.</em></h1><p id="account-state">Sign in to save your details and track orders live. Guest checkout remains available.</p></div>
+    <p id="account-message" class="form-message" role="status" aria-live="polite"></p>
+    <section id="login-panel" class="panel">
+      <h2>Optional customer account</h2><p class="muted">Connect Google or use email and password. If you have guest orders on this device, linking the account keeps them with your profile.</p>
+      <button id="google-login" class="button button-dark" type="button">Continue with Google</button>
+      <form id="email-login" class="panel" style="margin-top:16px">
+        <div class="form-row"><div class="field"><label for="account-email">Email</label><input id="account-email" type="email" autocomplete="email" required></div><div class="field"><label for="account-password">Password</label><input id="account-password" type="password" autocomplete="current-password" minlength="6" required></div></div>
+        <div class="account-actions"><button class="button button-dark" type="submit">Sign in</button><button id="email-register" class="button button-mustard" type="button">Create account</button><button id="guest-account" class="button-outline" type="button">Continue as guest</button></div>
+      </form>
+    </section>
+    <section id="profile-form" class="panel" hidden><div class="order-card-header"><h2>Saved details</h2><button id="sign-out" class="button-outline" type="button">Sign out</button></div>
+      <form id="customer-profile"><div class="form-row"><div class="field"><label for="profile-name">Name</label><input id="profile-name" maxlength="80" required></div><div class="field"><label for="profile-phone">Phone</label><input id="profile-phone" type="tel" maxlength="20" required></div></div><div class="field"><label for="profile-address">Saved address</label><textarea id="profile-address" rows="2" maxlength="300"></textarea></div><button class="button button-dark" type="submit">Save profile</button></form>
+    </section>
+    <section class="panel" style="margin-top:20px"><h2>My orders</h2><p class="muted">Order status updates appear here live when you're signed in with the account that placed the order.</p><div id="customer-orders"><p class="muted">Sign in or continue as guest to view orders tied to this device.</p></div></section>
+  </main>
+  <footer class="site-footer"><a class="brand" href="index.html"><span class="brand-mark">A</span><span><b>ANDAAZ</b><small>THE OMELETTE KITCHEN</small></span></a><p>ANDAAZ – Not Just An Omelette. It's A Whole New Andaz Of Eating.</p><a href="tel:+917011282410">7011282410</a></footer>
+</body>
+</html>

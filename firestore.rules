@@ -19,38 +19,97 @@ service cloud.firestore {
     function validItems(items) {
       return items is map
         && items.keys().size() > 0
-        && items.keys().hasOnly(['classic', 'masala', 'cheese', 'paneer', 'mushroom', 'chicken'])
-        && validQuantity(items, 'classic')
-        && validQuantity(items, 'masala')
-        && validQuantity(items, 'cheese')
+        && items.keys().hasOnly(['plain', 'veg', 'paneer', 'masala', 'chocolate', 'oats'])
+        && validQuantity(items, 'plain')
+        && validQuantity(items, 'veg')
         && validQuantity(items, 'paneer')
-        && validQuantity(items, 'mushroom')
-        && validQuantity(items, 'chicken');
+        && validQuantity(items, 'masala')
+        && validQuantity(items, 'chocolate')
+        && validQuantity(items, 'oats');
     }
 
     function expectedSubtotal(items) {
-      return items.get('classic', 0) * 14900
-        + items.get('masala', 0) * 17900
-        + items.get('cheese', 0) * 19900
-        + items.get('paneer', 0) * 22900
-        + items.get('mushroom', 0) * 21900
-        + items.get('chicken', 0) * 24900;
+      return items.get('plain', 0) * 5000
+        + items.get('veg', 0) * 5000
+        + items.get('paneer', 0) * 6000
+        + items.get('masala', 0) * 5000
+        + items.get('chocolate', 0) * 5000
+        + items.get('oats', 0) * 8000;
+    }
+
+    function expectedMidnightCharge() {
+      // 22:30 IST is 17:00 UTC. request.time is server UTC, not the browser clock.
+      return request.time.hours() > 17
+        || (request.time.hours() == 17 && request.time.minutes() > 0)
+        ? 2000 : 0;
+    }
+
+    function validLocation(data) {
+      return ((data.lat == null && data.lng == null)
+          || (data.lat is number && data.lng is number
+            && data.lat >= -90 && data.lat <= 90
+            && data.lng >= -180 && data.lng <= 180))
+        && (data.distanceMeters == null
+          || (data.distanceMeters is number && data.distanceMeters >= 0));
     }
 
     function validOrder() {
       let data = request.resource.data;
       return signedIn()
-        && data.keys().hasAll(['ownerUid', 'customerName', 'phone', 'address', 'notes', 'items', 'subtotal', 'status', 'createdAt'])
-        && data.keys().hasOnly(['ownerUid', 'customerName', 'phone', 'address', 'notes', 'items', 'subtotal', 'status', 'createdAt'])
+        && data.keys().hasAll([
+          'ownerUid', 'customerName', 'phone', 'address', 'formattedAddress',
+          'lat', 'lng', 'distanceMeters', 'notes', 'items', 'subtotal',
+          'midnightCharge', 'total', 'outOfArea', 'status', 'declineReason',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerUid', 'customerName', 'phone', 'address', 'formattedAddress',
+          'lat', 'lng', 'distanceMeters', 'notes', 'items', 'subtotal',
+          'midnightCharge', 'total', 'outOfArea', 'status', 'declineReason',
+          'createdAt', 'updatedAt'
+        ])
         && data.ownerUid == request.auth.uid
         && data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 80
         && data.phone is string && data.phone.size() >= 7 && data.phone.size() <= 20
         && data.address is string && data.address.size() >= 1 && data.address.size() <= 300
+        && data.formattedAddress is string && data.formattedAddress.size() >= 1 && data.formattedAddress.size() <= 300
         && data.notes is string && data.notes.size() <= 300
+        && data.declineReason == ''
+        && data.outOfArea is bool
+        && ((data.outOfArea && data.status == 'Pending – Out of Area')
+          || (!data.outOfArea && data.status == 'Pending'))
+        && validLocation(data)
         && validItems(data.items)
         && data.subtotal is int && data.subtotal == expectedSubtotal(data.items)
-        && data.status == 'received'
-        && data.createdAt == request.time;
+        && data.midnightCharge is int && data.midnightCharge == expectedMidnightCharge()
+        && data.total is int && data.total == data.subtotal + data.midnightCharge
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
+    }
+
+    function validProfile() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['name', 'phone', 'address', 'updatedAt'])
+        && data.keys().hasOnly(['name', 'phone', 'address', 'updatedAt'])
+        && data.name is string && data.name.size() <= 80
+        && data.phone is string && data.phone.size() <= 20
+        && data.address is string && data.address.size() <= 300
+        && data.updatedAt == request.time;
+    }
+
+    function validStatusTransition() {
+      let oldStatus = resource.data.status;
+      let newStatus = request.resource.data.status;
+      return ((oldStatus in ['Pending', 'Pending – Out of Area']
+            && newStatus in ['Accepted', 'Declined'])
+          || (oldStatus == 'Accepted' && newStatus in ['Preparing', 'Declined'])
+          || (oldStatus == 'Preparing' && newStatus in ['Out for delivery', 'Declined'])
+          || (oldStatus == 'Out for delivery' && newStatus == 'Delivered'))
+        && (newStatus == 'Declined'
+          ? (request.resource.data.declineReason is string
+            && request.resource.data.declineReason.size() >= 1
+            && request.resource.data.declineReason.size() <= 300)
+          : request.resource.data.declineReason == resource.data.declineReason);
     }
 
     match /admins/{userId} {
@@ -58,12 +117,19 @@ service cloud.firestore {
       allow list, create, update, delete: if false;
     }
 
+    match /users/{userId} {
+      allow get: if signedIn() && request.auth.uid == userId;
+      allow create, update: if signedIn() && request.auth.uid == userId && validProfile();
+      allow list, delete: if false;
+    }
+
     match /orders/{orderId} {
       allow create: if validOrder();
       allow get, list: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
       allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
-        && request.resource.data.status in ['received', 'preparing', 'ready', 'completed', 'cancelled'];
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'declineReason', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && validStatusTransition();
       allow delete: if isAdmin();
     }
 
